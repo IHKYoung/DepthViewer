@@ -20,7 +20,7 @@
 
    ```bash
    git clone https://github.com/IHKYoung/DepthViewer.git
-   cd calculate-depth-from-disparity
+   cd DepthViewer
    ```
 
 2. 创建并进入构建目录：
