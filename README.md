@@ -67,4 +67,4 @@
 
 ## 许可
 
-此项目使用MIT许可证。有关详细信息，请参阅[LICENSE](https://github.com/IHKYoung/DepthViewer/blob/baseline/LICENSE)文件。
+此项目使用MIT许可证。有关详细信息，请参阅[LICENSE](https://github.com/IHKYoung/DepthViewer/blob/main/LICENSE)文件。
