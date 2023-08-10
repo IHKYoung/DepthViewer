@@ -106,8 +106,8 @@ int main(int argc, char **argv)
     for (int i = 0; i < color_bar_height; i++)
     {
         float ratio = static_cast<float>(i) / (color_bar_height - 1);                                            // 从0到1的比例
-        float distance_ratio = max_distance - ratio * (max_distance - min_distance);                             // 将比例映射到最大和最小距离之间
-        uchar value = static_cast<uchar>(255 * (max_distance - distance_ratio) / (max_distance - min_distance)); // 根据距离计算颜色值
+        float ratio_distance = max_distance - ratio * (max_distance - min_distance);                             // 将比例映射到最大和最小距离之间
+        uchar value = static_cast<uchar>(255 * (max_distance - ratio_distance) / (max_distance - min_distance)); // 根据距离计算颜色值
         color_bar.row(i).setTo(value);
     }
 
