@@ -10,7 +10,7 @@ struct CameraParameters
 };
 
 cv::Mat disparity, real_disparity;
-cv::Rect roi;
+cv::Rect select_roi;
 double average_depth = 0.0;
 cv::Point mouse_position;
 CameraParameters camera;
@@ -30,22 +30,22 @@ void onMouse(int event, int x, int y, int flags, void *)
     if (event == cv::EVENT_LBUTTONDOWN)
     {
         start_point = mouse_position;
-        roi = cv::Rect(start_point, mouse_position);
+        select_roi = cv::Rect(start_point, mouse_position);
     }
     else if (event == cv::EVENT_MOUSEMOVE && (flags & cv::EVENT_FLAG_LBUTTON))
     {
-        roi = cv::Rect(start_point, mouse_position);
+        select_roi = cv::Rect(start_point, mouse_position);
     }
     else if (event == cv::EVENT_LBUTTONUP)
     {
-        roi = cv::Rect(start_point, mouse_position);
+        select_roi = cv::Rect(start_point, mouse_position);
 
         // 计算选择区域的平均深度
         int count = 0;
         average_depth = 0.0;
-        for (int i = roi.y; i < roi.y + roi.height; i++)
+        for (int i = select_roi.y; i < select_roi.y + select_roi.height; i++)
         {
-            for (int j = roi.x; j < roi.x + roi.width; j++)
+            for (int j = select_roi.x; j < select_roi.x + select_roi.width; j++)
             {
                 float disparity_value = real_disparity.at<float>(i, j);
                 if (disparity_value != 0)
@@ -148,7 +148,7 @@ int main(int argc, char **argv)
     while (true)
     {
         cv::Mat display_image = color_map.clone();
-        cv::rectangle(display_image, roi, cv::Scalar(0, 255, 0), 2);
+        cv::rectangle(display_image, select_roi, cv::Scalar(0, 255, 0), 2);
 
         // 显示平均深度
         std::stringstream ss_avg;
@@ -166,8 +166,8 @@ int main(int argc, char **argv)
         }
 
         // 定义ROI并将色条复制到视差图
-        cv::Rect roi(display_image.cols - 100, 50, color_bar_with_background.cols, color_bar_with_background.rows); // 定义色条的位置
-        color_bar_with_background.copyTo(display_image(roi));
+        cv::Rect show_roi(display_image.cols - 100, 50, color_bar_with_background.cols, color_bar_with_background.rows); // 定义色条的位置
+        color_bar_with_background.copyTo(display_image(show_roi));
         cv::imshow(windowTitle, display_image);
         char key = (char)cv::waitKey(1);
         if (key == 27)
