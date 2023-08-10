@@ -133,7 +133,6 @@ int main(int argc, char **argv)
     cv::Mat color_bar_with_background;
     int border = 5; // 边框宽度
     cv::copyMakeBorder(color_bar_resized, color_bar_with_background, border, border, border, border, cv::BORDER_CONSTANT, cv::Scalar(255, 255, 255));
-    cv::imshow("Test", color_bar_with_background);
 
     // 使用伪彩色可视化
     cv::Mat color_map;
@@ -141,7 +140,7 @@ int main(int argc, char **argv)
     cv::normalize(disparity, disparity_norm, 0, 255, cv::NORM_MINMAX, CV_8U);
     cv::applyColorMap(disparity_norm, color_map, cv::COLORMAP_JET);
 
-    const std::string windowTitle = "视差图";
+    const std::string windowTitle = "Depth Viewer";
     cv::namedWindow(windowTitle, cv::WINDOW_NORMAL);
     cv::resizeWindow(windowTitle, disparity.cols, disparity.rows);
     cv::setMouseCallback(windowTitle, onMouse);
@@ -169,7 +168,7 @@ int main(int argc, char **argv)
         // 定义ROI并将色条复制到视差图
         cv::Rect roi(display_image.cols - 100, 50, color_bar_with_background.cols, color_bar_with_background.rows); // 定义色条的位置
         color_bar_with_background.copyTo(display_image(roi));
-        cv::imshow("视差图", display_image);
+        cv::imshow(windowTitle, display_image);
         char key = (char)cv::waitKey(1);
         if (key == 27)
             break; // 按'Esc'退出
