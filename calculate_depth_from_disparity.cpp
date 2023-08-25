@@ -88,7 +88,7 @@ int main(int argc, char **argv) {
 
     // 创建色条
     int color_bar_height = disparity.rows;
-    int color_bar_width =100; // 调整色条宽度
+    int color_bar_width = 90; // 调整色条宽度
     cv::Mat color_bar(color_bar_height, color_bar_width, CV_32F);
     for (int i = 0; i < color_bar_height; i++) {
         float ratio = static_cast<float>(i) / (color_bar_height - 1);          // 从0到1的比例
@@ -106,7 +106,7 @@ int main(int argc, char **argv) {
     int thickness = 2;
 
     std::vector<double> disparities;
-    std::vector<int> ratios = {1, 2, 3, 5}; // 定义比例系数
+    std::vector<int> ratios = {1, 2, 3, 5, 8}; // 定义比例系数
 
     for (int ratio : ratios) {
         disparities.push_back(max_disparity / ratio);
@@ -121,7 +121,7 @@ int main(int argc, char **argv) {
         // 使用stringstream进行格式化
         std::stringstream ss;
         ss << std::fixed << std::setprecision(1) << distance_value;
-        std::string distance = ss.str() + 'm';
+        std::string distance = ss.str();
 
         // 居中打印
         cv::Size textSize = cv::getTextSize(distance, cv::FONT_HERSHEY_SIMPLEX, font_scale, thickness, 0);
