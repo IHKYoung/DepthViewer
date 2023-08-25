@@ -113,8 +113,6 @@ int main(int argc, char **argv) {
     }
 
     for (double disparity : disparities) {
-        // // 将视差转换为距离，并四舍五入到最近的整数
-        // int distance = static_cast<int>(std::round(computeDepth(disparity)));
         // 将视差转换为距离
         double distance_value = computeDepth(disparity);
 
