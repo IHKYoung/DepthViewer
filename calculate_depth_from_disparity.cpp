@@ -101,7 +101,7 @@ int main(int argc, char **argv)
 
     // 创建色条
     int color_bar_height = disparity.rows;
-    int color_bar_width = 60; // 调整色条宽度
+    int color_bar_width = 80; // 调整色条宽度
     cv::Mat color_bar(color_bar_height, color_bar_width, CV_8U);
     for (int i = 0; i < color_bar_height; i++)
     {
@@ -114,14 +114,27 @@ int main(int argc, char **argv)
     cv::Mat color_bar_color_map;
     cv::applyColorMap(color_bar, color_bar_color_map, cv::COLORMAP_JET);
 
+    int order_of_magnitude = std::pow(10, static_cast<int>(std::log10(max_distance)));
+    int actual_interval = std::min(100, order_of_magnitude);
+    std::cout << "actual_interval: " << actual_interval << std::endl;
+
     // 在色条上添加距离标签
-    for (int distance = static_cast<int>(max_distance); distance >= min_distance; distance--)
-    {
+    float font_scale = 1.0; // 调整字体大小
+    int thickness = 2;
+    int baseline = 0;
+    for (int distance = 0; distance <= max_distance; distance += actual_interval) {
+        if (distance == 0) {
+            continue;
+        }
+        // 居中打印
+        cv::Size textSize = cv::getTextSize(std::to_string(distance), cv::FONT_HERSHEY_SIMPLEX, font_scale, thickness, &baseline);
+        int x_center = (color_bar_width - textSize.width) / 2;
         float ratio = (max_distance - distance) / (max_distance - min_distance);
         int i = static_cast<int>(ratio * (color_bar_height - 1));
-        cv::putText(color_bar_color_map, std::to_string(distance) + "m", cv::Point(5, i), cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(0, 0, 0), 3, cv::LINE_AA);
-        cv::putText(color_bar_color_map, std::to_string(distance) + "m", cv::Point(5, i), cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(255, 255, 255), 2, cv::LINE_AA);
+        cv::putText(color_bar_color_map, std::to_string(distance), cv::Point(x_center, i), cv::FONT_HERSHEY_SIMPLEX, font_scale, cv::Scalar(0, 0, 0), 3, cv::LINE_AA);
+        cv::putText(color_bar_color_map, std::to_string(distance), cv::Point(x_center, i), cv::FONT_HERSHEY_SIMPLEX, font_scale, cv::Scalar(255, 255, 255), 2, cv::LINE_AA);
     }
+
 
     // 拼接视差图和带有距离标签的色条图像
     cv::Mat combined_image;
@@ -166,7 +179,8 @@ int main(int argc, char **argv)
         }
 
         // 定义ROI并将色条复制到视差图
-        cv::Rect show_roi(display_image.cols - 100, 50, color_bar_with_background.cols, color_bar_with_background.rows); // 定义色条的位置
+        int y_centered = (display_image.rows - color_bar_with_background.rows) / 2;
+        cv::Rect show_roi(display_image.cols - 100, y_centered, color_bar_with_background.cols, color_bar_with_background.rows); // 定义色条的位置
         color_bar_with_background.copyTo(display_image(show_roi));
         cv::imshow(windowTitle, display_image);
         char key = (char)cv::waitKey(1);
