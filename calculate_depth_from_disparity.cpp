@@ -8,7 +8,7 @@ struct CameraParameters {
     int disparity_factor;
 };
 
-cv::Mat disparity, real_disparity;
+cv::Mat disparity, real_disparity, depth_image;
 cv::Rect select_roi;
 double average_depth = 0.0;
 cv::Point mouse_position;
@@ -73,6 +73,24 @@ int main(int argc, char **argv) {
     // 转换为真实视差
     real_disparity = disparity.clone();
     real_disparity.convertTo(real_disparity, CV_32F, 1.0 / camera.disparity_factor);
+
+    // 保存深度图
+    std::string depth_image_path = image_path.substr(0, image_path.find_last_of('.')) + "_depth.png";
+    // 初始化深度图，与视差图尺寸相同，类型为32位浮点
+    depth_image = cv::Mat(real_disparity.size(), CV_32F);
+    // 遍历每个像素，计算深度值
+    for (int y = 0; y < real_disparity.rows; ++y) {
+        for (int x = 0; x < real_disparity.cols; ++x) {
+            float d = real_disparity.at<float>(y, x);
+            if (d > 0) { // 视差为0意味着深度无穷大，通常会忽略
+                depth_image.at<float>(y, x) = computeDepth(d);
+            } else {
+                depth_image.at<float>(y, x) = 0; // 无穷远处或无法计算视差的区域，深度设置为0
+            }
+        }
+    }
+    std::cout << "保存深度图: " << depth_image_path << std::endl;
+    cv::imwrite(depth_image_path, depth_image);
 
     // 计算最大和最小视差
     double min_disparity, max_disparity;
