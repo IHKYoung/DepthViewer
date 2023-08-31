@@ -76,19 +76,23 @@ int main(int argc, char **argv) {
 
     // 保存深度图
     std::string depth_image_path = image_path.substr(0, image_path.find_last_of('.')) + "_depth.png";
-    // 初始化深度图，与视差图尺寸相同，类型为32位浮点
-    depth_image = cv::Mat(real_disparity.size(), CV_32F);
+    // 初始化深度图，与视差图尺寸相同
+    depth_image = cv::Mat(real_disparity.size(), CV_16UC1);
+    // 采用KITTI数据集的缩放因子
+    float scale_depth = 256.0;
+
     // 遍历每个像素，计算深度值
     for (int y = 0; y < real_disparity.rows; ++y) {
         for (int x = 0; x < real_disparity.cols; ++x) {
             float d = real_disparity.at<float>(y, x);
             if (d > 0) { // 视差为0意味着深度无穷大，通常会忽略
-                depth_image.at<float>(y, x) = computeDepth(d);
+                depth_image.at<ushort>(y, x) = static_cast<ushort>(computeDepth(d) * scale_depth);
             } else {
-                depth_image.at<float>(y, x) = 0; // 无穷远处或无法计算视差的区域，深度设置为0
+                depth_image.at<ushort>(y, x) = 0; // 无穷远处或无法计算视差的区域，深度设置为0
             }
         }
     }
+
     std::cout << "保存深度图: " << depth_image_path << std::endl;
     cv::imwrite(depth_image_path, depth_image);
 
